@@ -6,11 +6,7 @@ export default function ViewMyProjectsPage(){
     const { projects, loadMyProjects } = useDAppStore();
 
     useEffect(() => {
-        loadMyProjects().then(() => {
-            projects.forEach((project) => {
-                console.log(project.status);
-            });
-        });
+        loadMyProjects()
     }, []);
 
     return (

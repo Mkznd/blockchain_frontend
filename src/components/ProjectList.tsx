@@ -1,9 +1,9 @@
 import Project, {ProjectStatus} from "@/types/Project.ts";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import useDAppStore from "@/store/store.ts";
 
 export default function ProjectList({projects} : {projects: Project[]}) {
-    const {contribute} = useDAppStore();
+    const {contribute, withdrawFunds} = useDAppStore();
     const [form, setForm] = useState({ goal: "" });
 
     const formatEther = (value: bigint): string => {
@@ -15,6 +15,11 @@ export default function ProjectList({projects} : {projects: Project[]}) {
         if (goal === BigInt(0)) return 0;
         return Number((fundsRaised * BigInt(100)) / goal);
     };
+
+    const handleWithdraw = (projectId) => {
+        withdrawFunds(projectId);
+    };
+
     return (
         <>
             {projects.map((project, index) => (
@@ -31,7 +36,7 @@ export default function ProjectList({projects} : {projects: Project[]}) {
                             <strong>Funds Raised:</strong> {formatEther(project.fundsRaised)} ETH<br />
                             <strong>Status:</strong> {ProjectStatus[project.status]} <br />
                             <strong>Deadline:</strong> {new Date(Number(project.deadline)).toLocaleDateString()} <br />
-                            <strong>Token:</strong> {project.token}
+                            <strong>Token:</strong> {`PTKN-${project.projectId}`}
                         </div>
 
                         <div className="progress" style={{ height: "10px" }}>
@@ -50,7 +55,7 @@ export default function ProjectList({projects} : {projects: Project[]}) {
                         </p>
 
                         {
-                            project.status === ProjectStatus.Active && (
+                            project.status == ProjectStatus.Active && (
                                 <div>
                                     <input
                                         type="text"
@@ -59,12 +64,39 @@ export default function ProjectList({projects} : {projects: Project[]}) {
                                         onChange={(e) => setForm({ ...form, goal: e.target.value })}
                                         className="form-control mb-2"
                                     />
-                                    <button className={'btn btn-secondary'} onClick={() => {
+                                    <button className={'btn btn-secondary'} onClick={async () => {
                                         contribute(project.projectId.toLocaleString(), form.goal);
                                         setForm({ goal: "" });
+                                        const wasAdded = await window.ethereum.request({
+                                            method: "wallet_watchAsset",
+                                            params: {
+                                                type: "ERC20",
+                                                options: {
+                                                    address: project.token,
+                                                    symbol: `PTKN-${project.projectId}`,
+                                                    decimals: 18,
+                                                    image: null,
+                                                },
+                                            },
+                                        });
+
+                                        if (wasAdded) {
+                                            console.log("Token added to MetaMask");
+                                        } else {
+                                            console.log("Token addition canceled");
+                                        }
                                     }}>Contribute!</button>
                                 </div>
 
+                            )
+                        }
+                        {
+                            project.status == ProjectStatus.Successful && (
+                                <button onClick={() => {
+                                    handleWithdraw(project.projectId.toLocaleString());
+                                }} className="btn btn-success">
+                                    Withdraw
+                                </button>
                             )
                         }
                     </div>

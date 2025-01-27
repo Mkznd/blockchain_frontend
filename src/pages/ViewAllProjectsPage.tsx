@@ -6,11 +6,7 @@ const ViewAllProjectsPage: React.FC = () => {
     const { projects, loadAllProjects } = useDAppStore();
 
     useEffect(() => {
-        loadAllProjects().then(() => {
-            projects.forEach((project) => {
-                console.log(project.status);
-            });
-        });
+        loadAllProjects();
     }, []);
 
 

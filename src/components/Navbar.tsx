@@ -18,9 +18,6 @@ const Navbar = () => (
                     <li className="nav-item">
                         <Link to="/refund" className="nav-link">Refund</Link>
                     </li>
-                    <li className="nav-item">
-                        <Link to="/withdraw" className="nav-link">Withdraw</Link>
-                    </li>
                 </ul>
             </div>
         </div>
