@@ -33,7 +33,7 @@ const RegisterPage: React.FC = () => {
         try {
             // Example: calling your FastAPI create user endpoint
             // e.g. POST /user => { ...user data... }
-            const response = await axios.post("http://localhost:8000/user", formData);
+            const response = await axios.post(import.meta.env.VITE_BACKEND_URL+"/user", formData);
             const { token } = response.data;
             login(token);
             navigate("/login");

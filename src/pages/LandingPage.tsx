@@ -2,7 +2,7 @@ import useDAppStore from "@/store/store.ts";
 import {useNavigate} from "react-router-dom";
 
 
-const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+const contractAddress = import.meta.env.VITE_CONTRACT_ADDRESS as string;
 
 const LoginPage: React.FC = () => {
     const isLoggedIn = useDAppStore();

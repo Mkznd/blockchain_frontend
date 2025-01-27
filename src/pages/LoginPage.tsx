@@ -29,7 +29,7 @@ const LoginPage: React.FC = () => {
         try {
             // Example: calling your FastAPI JWT login endpoint
             // e.g. POST /auth/login => { "token": "...", "token_type": "bearer" }
-            const response = await axios.post("http://localhost:8000/auth/login", {
+            const response = await axios.post(import.meta.env.VITE_BACKEND_URL+"/auth/login", {
                 username: credentials.username,
                 password: credentials.password,
             });
