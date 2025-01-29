@@ -16,5 +16,5 @@ COPY . .
 # Expose the port the app runs on
 EXPOSE 3000
 
-# Command to run the development server
+# Command to run the development server.js
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
