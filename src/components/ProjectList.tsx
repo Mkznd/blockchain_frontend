@@ -1,14 +1,15 @@
 import Project, {ProjectStatus} from "@/types/Project.ts";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import useDAppStore from "@/store/store.ts";
 
-export default function ProjectList({projects} : {projects: Project[]}) {
+
+export default function ProjectList({projects}: { projects: Project[] }) {
     const {contribute, withdrawFunds} = useDAppStore();
-    const [form, setForm] = useState({ goal: "" });
+    const [form, setForm] = useState({goal: ""});
 
     const formatEther = (value: bigint): string => {
         const etherValue = Number(value) / 10 ** 18;
-        return etherValue.toLocaleString(undefined, { maximumFractionDigits: 4 });
+        return etherValue.toLocaleString(undefined, {maximumFractionDigits: 4});
     };
 
     const calculatePercentage = (fundsRaised: bigint, goal: bigint): number => {
@@ -16,6 +17,7 @@ export default function ProjectList({projects} : {projects: Project[]}) {
         return Number((fundsRaised * BigInt(100)) / goal);
     };
 
+    
     const handleWithdraw = (projectId) => {
         withdrawFunds(projectId);
     };
@@ -31,19 +33,19 @@ export default function ProjectList({projects} : {projects: Project[]}) {
                         <p className="card-text mb-3">{project.description}</p>
 
                         <div className="mb-3">
-                            <strong>Project:</strong> {project.projectId.toLocaleString()}<br />
-                            <strong>Goal:</strong> {formatEther(project.goal)} ETH<br />
-                            <strong>Funds Raised:</strong> {formatEther(project.fundsRaised)} ETH<br />
-                            <strong>Status:</strong> {ProjectStatus[project.status]} <br />
-                            <strong>Deadline:</strong> {new Date(Number(project.deadline)).toLocaleDateString()} <br />
+                            <strong>Project:</strong> {project.projectId.toLocaleString()}<br/>
+                            <strong>Goal:</strong> {formatEther(project.goal)} ETH<br/>
+                            <strong>Funds Raised:</strong> {formatEther(project.fundsRaised)} ETH<br/>
+                            <strong>Status:</strong> {ProjectStatus[project.status]} <br/>
+                            <strong>Deadline:</strong> {new Date(Number(project.deadline)).toLocaleDateString()} <br/>
                             <strong>Token:</strong> {`PTKN-${project.projectId}`}
                         </div>
 
-                        <div className="progress" style={{ height: "10px" }}>
+                        <div className="progress" style={{height: "10px"}}>
                             <div
                                 className="progress-bar bg-success"
                                 role="progressbar"
-                                style={{ width: `${calculatePercentage(project.fundsRaised, project.goal)}%` }}
+                                style={{width: `${calculatePercentage(project.fundsRaised, project.goal)}%`}}
                                 aria-valuenow={calculatePercentage(project.fundsRaised, project.goal)}
                                 aria-valuemin={0}
                                 aria-valuemax={100}
@@ -61,12 +63,12 @@ export default function ProjectList({projects} : {projects: Project[]}) {
                                         type="text"
                                         placeholder="Contribute (ETH)"
                                         value={form.goal}
-                                        onChange={(e) => setForm({ ...form, goal: e.target.value })}
+                                        onChange={(e) => setForm({...form, goal: e.target.value})}
                                         className="form-control mb-2"
                                     />
                                     <button className={'btn btn-secondary'} onClick={async () => {
                                         contribute(project.projectId.toLocaleString(), form.goal);
-                                        setForm({ goal: "" });
+                                        setForm({goal: ""});
                                         const wasAdded = await window.ethereum.request({
                                             method: "wallet_watchAsset",
                                             params: {
@@ -85,7 +87,8 @@ export default function ProjectList({projects} : {projects: Project[]}) {
                                         } else {
                                             console.log("Token addition canceled");
                                         }
-                                    }}>Contribute!</button>
+                                    }}>Contribute!
+                                    </button>
                                 </div>
 
                             )

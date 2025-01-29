@@ -10,14 +10,16 @@ interface DAppState {
     crowdfundingContract: ethers.Contract | null;
     projects: Project[];
     contractAbi: any;
+    totalPages: number;
+    currentPage: number;
 
     connectWallet: (contractAddress: string) => Promise<void>;
-    loadAllProjects: () => Promise<void>;
+    loadAllProjects: (page?: number) => Promise<void>;
+    loadMyProjects: (page?: number) => Promise<void>;
     createProject: (name: string, description: string, goal: string, durationInDays: string) => Promise<void>;
     contribute: (projectId: string, amount: string) => Promise<void>;
     refund: (projectId: string) => Promise<void>;
     withdrawFunds: (projectId: string) => Promise<void>;
-    loadMyProjects: () => Promise<void>;
 }
 
 const useDAppStore = create<DAppState>((set, get) => ({
@@ -27,6 +29,8 @@ const useDAppStore = create<DAppState>((set, get) => ({
     crowdfundingContract: null,
     projects: [],
     contractAbi: undefined,
+    totalPages: 1,
+    currentPage: 1,
 
 
     connectWallet: async (contractAddress) => {
@@ -40,27 +44,30 @@ const useDAppStore = create<DAppState>((set, get) => ({
         set({ provider, signer, account: accounts[0], crowdfundingContract: contract });
     },
 
-    loadAllProjects: async () => {
-        const { crowdfundingContract, account } = get();
+    loadAllProjects: async (page = 1) => {
+        const { crowdfundingContract } = get();
         if (!crowdfundingContract) return;
 
         try {
-            const projects = await crowdfundingContract.getAllProjects();
-            set({ projects });
+            const pageSize = 10; // Define how many projects per page
+            const result = await crowdfundingContract.getProjects(page, pageSize);
+            set({ projects: result, currentPage: page });
         } catch (error) {
             console.error("Error loading projects:", error);
         }
     },
 
-    loadMyProjects: async () => {
-        const { crowdfundingContract, account } = get();
-        if (!crowdfundingContract) return;
+    loadMyProjects: async (page = 1) => {
+        const { crowdfundingContract, account, pageSize } = get();
+        if (!crowdfundingContract || !account) return;
 
         try {
-            const projects = await crowdfundingContract.getProjectsByOwner(account);
-            set({ projects });
+            const startIndex = (page - 1) * pageSize;
+            const result = await crowdfundingContract.getProjectsByOwner(account, startIndex, pageSize);
+
+            set({ projects: result, currentPage: page });
         } catch (error) {
-            console.error("Error loading projects:", error);
+            console.error("Error loading my projects:", error);
         }
     },
 
